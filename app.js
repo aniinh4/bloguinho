@@ -1,5 +1,5 @@
 const express = require('express');
-const mysql = require('mysql');
+const mysql = require('mysql2');
 const session = require('express-session');
 const bodyParser = require('body-parser');
 const app = express();
@@ -7,8 +7,8 @@ const app = express();
 // Configurar a conexão com o banco de dados MySQL
 const db = mysql.createConnection({
     host: 'localhost',
-    user: 'root',
-    password: '',
+    user: 'phpmyadmin',
+    password: 'anaj',
     database: 'mydb',
 });
 
