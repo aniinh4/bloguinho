@@ -63,9 +63,16 @@ app.get('/about', (req, res) => {
     res.render('pages/about', { req: req })
 });
 
+app.get('/about', (req, res) => {
+    res.render('pages/about', { req: req })
+});
+app.get('/cadastrar_post', (req, res) => {
+    res.render('pages/cadastrar_posts', { req: req })
+});
+
 // Rota para processar o formulário de login
 app.post('/login', (req, res) => {
-    const { username, password } = req.body;
+    const { titulo, post } = req.body;
 
     const query = 'SELECT * FROM users WHERE username = ? AND password = SHA1(?)';
 
@@ -93,11 +100,11 @@ app.get('/cadastrar', (req, res) => {
 });
 
 // Rota para efetuar o cadastro de usuário no banco de dados
-app.post('/cadastrar', (req, res) => {
-    const { username, password } = req.body;
+app.post('/cadastrar_posts', (req, res) => {
+    const { titulo, post } = req.body;
 
     // Verifica se o usuário já existe
-    const query = 'SELECT * FROM users WHERE username = ? AND password = SHA1(?)';
+    const query = 'INSERT INTO post (titulo, post) VALUES (?,?)';
     db.query(query, [username, password], (err, results) => {
         if (err) throw err;
         // Caso usuário já exista no banco de dados, redireciona para a página de cadastro inválido
@@ -106,9 +113,9 @@ app.post('/cadastrar', (req, res) => {
             res.redirect('/register_failed');
         } else {
             // Cadastra o usuário caso não exista
-            const query = 'INSERT INTO users (username, password) VALUES (?, SHA1(?))';
+            const query = 'INSERT INTO users (titulo, posts) VALUES (?, SHA1(?))';
             console.log(`POST /CADASTAR -> query -> ${query}`);
-            db.query(query, [username, password], (err, results) => {
+            db.query(query, [titulo, post], (err, results) => {
                 console.log(results);
                 //console.log(`POST /CADASTAR -> results -> ${results}`);
 
