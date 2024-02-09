@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ptbr">
+
+<head>
+    <%- include('../partials/head'); %>
+</head>
+
+<body class="container">
+
+    <header>
+        <%- include('../partials/header'); %>
+        <% if(req.session.loggedin) { %>
+        <%- include('../partials/menu_dashboard'); %>
+        <% } %>        
+        </header>
+<br>
+<h1>Postagem</h1>
+<br>
+    <main>
+        <%- include('../partials/postcount'); %>
+
+        <div class="container">
+            <table id="datatablesSimple">
+                <thead>
+                    <tr>
+                        <th>titulo</th>
+                        <th>conteudo</th>
+                        <th>data</th>
+                        <th>usuario</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% posts.forEach(post => { %>
+                        <tr>
+                            <td><%= post.titulo %></td> 
+                            <td><%= post.conteudo %></td>
+                            <td><%= post.data %></td>
+                            <td><%= post.usuario %></td>
+                            <td>
+                               <a href="/excluirpost/ <%= post.id %>"> excluir post</a>
+                            </td>
+                        </tr>
+                    <% }); %>
+                    
+                </tbody>
+            </table>
+        </div>
+    </main>
+<br>
+
+    <footer>
+        <%- include('../partials/footer'); %>
+    </footer>
+
+</body>
+
+<style>
+    .container {
+        margin: 20px;
+    }
+
+    #datatablesSimple {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    #datatablesSimple th,
+    #datatablesSimple td {
+        border: 1px solid black;
+        padding: 8px;
+        text-align: left;
+    }
+
+    #datatablesSimple th {
+        background-color: #f2f2f2;
+    }
+</style>

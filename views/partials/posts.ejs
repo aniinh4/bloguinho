@@ -1,0 +1,59 @@
+<div id="post-container">
+  <% posts.forEach(post => { %>
+  <div class="post">
+    <h3>
+      <%= post.titulo %>
+    </h3>
+    <p>
+      <%= post.conteudo %>
+    </p>
+    <p>
+      <%= post.data %>
+    </p>
+    <p>
+      <%= post.usuario %>
+    </p>
+  </div>
+  <% }) %>
+</div>
+
+<style>
+      #post-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+}
+
+.post {
+  width: 300px;
+  margin: 10px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.post:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.post h3 {
+  margin-bottom: 10px;
+  font-size: 1.5em;
+}
+
+.post p {
+  margin-bottom: 5px;
+}
+
+.post .data {
+  color: #888;
+}
+
+.post .usuario {
+  font-weight: bold;
+  color: #333;
+}
+
+</style>

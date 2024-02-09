@@ -14,18 +14,18 @@
         <!-- <div class="jumbotron"></div> -->
         <div class="container-sm border border-danger rounded-lg">
             <div class="form-group">
-                <h3 style="text-align: center;">Cadastro de usuário</h3>
-                <form action="/cadastrar" method="post">
+                <h3 style="text-align: center;">Cadastrar postagem</h3>
+                <form action="/cadastrar_posts" method="post">
                     <div class="form-group">
-                        <div><label for="username">Titulo da postagem</label></div>
-                        <div><input type="text" id="titulo" name="titulo required class="form-control"></div>
+                        <div><label for="titulo">Titulo da postagem</label></div>
+                        <div><input type="text" id="titulo" name="titulo" required class="form-control"></div>
                     </div>
                     <div class="form-group">
-                        <div><label for="post">Senha:</label></div>
-                        <div> <input type="password" id="post" name="post" required class="form-control"></div>
+                        <div><label for="conteudo">Conteudo</label></div>
+                        <div> <textarea id="conteudo" name="conteudo"></textarea></div>
                     </div>
                     <!-- TODO: Implementar um campo para verificar na página se as senhas coincidem -->
-                    <div><button type="submit" class="form-control btn btn-dark">Efetuar cadastro</button></div>
+                    <div><button type="submit" class="form-control btn btn-dark">Postar</button></div>
                 </form>
             </div>
         </div>

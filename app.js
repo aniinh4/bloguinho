@@ -9,7 +9,7 @@ const db = mysql.createConnection({
     host: 'localhost',
     user: 'phpmyadmin',
     password: 'anaj',
-    database: 'mydb',
+    database: 'mydb2',
 });
 
 db.connect((err) => {
@@ -46,7 +46,8 @@ app.set('view engine', 'ejs');
 app.get('/', (req, res) => {
     // Passe a variável 'req' para o template e use-a nas páginas para renderizar partes do HTML conforme determinada condição
     // Por exemplo de o usuário estive logado, veja este exemplo no arquivo views/partials/header.ejs
-    res.render('pages/index', { req: req });
+  //  res.render('pages/pgposts', { req: req });
+  res.redirect('/posts');
     // Caso haja necessidade coloque pontos de verificação para verificar pontos da sua logica de negócios
     console.log(`${req.session.username ? `Usuário ${req.session.username} logado no IP ${req.connection.remoteAddress}` : 'Usuário não logado.'}  `);
     //console.log(req.connection)
@@ -59,20 +60,86 @@ app.get('/login', (req, res) => {
     res.render('pages/login', { req: req });
 });
 
-app.get('/about', (req, res) => {
-    res.render('pages/about', { req: req })
-});
 
 app.get('/about', (req, res) => {
     res.render('pages/about', { req: req })
 });
+
+
+app.get('/posts', (req, res) => {
+db.query('SELECT * FROM posts', (err, results) => {
+    if (err) {
+        console.error('erro na consulta SQL');
+        return res.status(500).send('erro interno');
+    }
+    console.log(results);
+    res.render('pages/pgposts', { req: req, posts: results })
+});
+});
+
+app.get('/postlist', (req, res) => {
+    const userId = req.session.username;
+
+    // Consultar o banco de dados para obter o número total de postagens do usuário
+    db.query('SELECT COUNT(*) as postCount FROM posts WHERE usuario = ?', [userId], (errCount, resultCount) => {
+        if (errCount) {
+            console.error(errCount);
+            res.status(500).send('Erro interno do servidor');
+            return;
+        }
+
+        const postCount = resultCount[0].postCount;
+
+        // Consultar o banco de dados para obter a lista de postagens do usuário
+        db.query('SELECT * FROM posts WHERE usuario = ?', [userId], (err, result) => {
+            if (err) {
+                console.error(err);
+                res.status(500).send('Erro interno do servidor');
+                return;
+            }
+
+            // Renderizar a página e passar 'name', 'postCount', e 'posts' para o EJS
+            res.render('pages/postlist', { usuario: req.session.name, postCount, posts: result, req: req });
+        });
+    });
+});
+
+
+//excluir post
+app.get('/excluirPost/:id', (req, res) => {
+    const id = req.params.id;
+    
+    db.query('DELETE FROM posts WHERE id = ?', [id], (err, result) => {
+        if (err) {
+            console.error('Erro ao excluir post:', err);
+            res.status(500).send('Erro interno do servidor');
+            return;
+        }
+
+        // Adicione o console.log para registrar a exclusão do post
+        console.log(`Post com ID ${id} excluído com sucesso.`);
+
+        res.redirect('/postlist');
+    });
+
+});
+
+app.get('/post_failed', (req, res) => {
+    res.render('pages/post_failed', { req: req })
+});
+
+
 app.get('/cadastrar_post', (req, res) => {
     res.render('pages/cadastrar_posts', { req: req })
 });
 
+
+
+
+
 // Rota para processar o formulário de login
 app.post('/login', (req, res) => {
-    const { titulo, post } = req.body;
+    const { username, password } = req.body;
 
     const query = 'SELECT * FROM users WHERE username = ? AND password = SHA1(?)';
 
@@ -100,11 +167,11 @@ app.get('/cadastrar', (req, res) => {
 });
 
 // Rota para efetuar o cadastro de usuário no banco de dados
-app.post('/cadastrar_posts', (req, res) => {
-    const { titulo, post } = req.body;
+app.post('/cadastrar', (req, res) => {
+    const { username, password } = req.body;
 
     // Verifica se o usuário já existe
-    const query = 'INSERT INTO post (titulo, post) VALUES (?,?)';
+    const query = 'SELECT * FROM users WHERE username = ? AND password = SHA1(?)';
     db.query(query, [username, password], (err, results) => {
         if (err) throw err;
         // Caso usuário já exista no banco de dados, redireciona para a página de cadastro inválido
@@ -113,9 +180,9 @@ app.post('/cadastrar_posts', (req, res) => {
             res.redirect('/register_failed');
         } else {
             // Cadastra o usuário caso não exista
-            const query = 'INSERT INTO users (titulo, posts) VALUES (?, SHA1(?))';
+            const query = 'INSERT INTO users (username, password) VALUES (?, SHA1(?))';
             console.log(`POST /CADASTAR -> query -> ${query}`);
-            db.query(query, [titulo, post], (err, results) => {
+            db.query(query, [username, password], (err, results) => {
                 console.log(results);
                 //console.log(`POST /CADASTAR -> results -> ${results}`);
 
@@ -132,6 +199,29 @@ app.post('/cadastrar_posts', (req, res) => {
         }
     });
 });
+
+
+// Rota para processar o formulário de caastro depostagem
+app.post('/cadastrar_posts', (req, res) => {
+    const { titulo, conteudo } = req.body;
+    const autor = "admin";
+    const data = new Date();
+    // const query = 'SELECT * FROM users WHERE username = ? AND password = SHA1(?)';
+    const query = 'INSERT INTO posts (titulo, conteudo, autor, data) VALUES (?, ?, ?, ?)';
+
+    db.query(query, [titulo, conteudo, autor, data], (err, results) => {
+        if (err) throw err;
+
+        if (results.affectedRows > 0) {
+            console.log('Cadastro de postagem OK')
+            res.redirect('/dashboard');
+        } else {
+            // res.send('Credenciais incorretas. <a href="/">Tente novamente</a>');
+            res.redirect('/post_failed');
+        }
+    });
+});
+
 
 app.get('/register_failed', (req, res) => {
     res.render('pages/register_failed', { req: req });
@@ -174,7 +264,7 @@ app.get('/teste', (req, res) => {
 });
 
 
-app.listen(3000, () => {
+app.listen(3002, () => {
     console.log('----Login (MySQL version)-----')
     console.log('Servidor rodando na porta 3000');
 });
